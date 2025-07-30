@@ -1,0 +1,75 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "watchpoint"
+version = "0.1.0"
+description = "A lightweight Python utility for running an action when a specific condition is met."
+authors = [{ name = "Your Name", email = "your.email@example.com" }]
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.9,<4.0"
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+
+dependencies = [
+]
+
+
+[project.optional-dependencies]
+dev = [
+    "pytest (>=8.0.0,<9.0.0)",
+    "black (>=24.0.0,<26.0.0)",
+    "isort (>=5.13.0,<7.0.0)",
+    "mypy (>=1.14.0,<2.0.0)",
+    "flake8 (>=7.0.0,<8.0.0)",
+    "pre-commit (>=3.0.0,<5.0.0)",
+    "tox (>=4.24.0,<4.26.0)",
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["watchpoint"]
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+
+
+[tool.mypy]
+disable_error_code = [
+    "var-annotated",
+    "no-redef",
+    "import-untyped"
+]
+python_version = "3.10"
+warn_unused_configs = true
+ignore_missing_imports = true
+show_error_codes = true
+
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = false
+disallow_untyped_decorators = false
+disallow_untyped_calls = false
+warn_return_any = false
+warn_no_return = false
+warn_unused_ignores = false
+
+disallow_subclassing_any = false
+disallow_any_generics = false
+exclude = ["scripts/"]
