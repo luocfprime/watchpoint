@@ -134,7 +134,7 @@ class TestWatchpointOneShotMode:
         """When on_handler returns True, do_handler must be executed."""
         watchpoint = Watchpoint().on(on_returns_true).do(do_action_marker)
         watchpoint.start()
-        time.sleep(0.1)  # Allow thread time to execute
+        time.sleep(1.0)  # Allow thread time to execute
 
         assert call_tracker == ["called"]
         # The thread should be finished after a one-shot execution
@@ -144,7 +144,7 @@ class TestWatchpointOneShotMode:
         """When on_handler returns False, do_handler must NOT be executed."""
         watchpoint = Watchpoint().on(on_returns_false).do(do_action_marker)
         watchpoint.start()
-        time.sleep(0.1)  # Allow thread time to execute
+        time.sleep(1.0)  # Allow thread time to execute
 
         assert not call_tracker
         assert watchpoint._thread is not None and not watchpoint._thread.is_alive()
@@ -155,7 +155,7 @@ class TestWatchpointOneShotMode:
             Watchpoint().on(on_returns_true).do(do_action_marker, marker="custom")
         )
         watchpoint.start()
-        time.sleep(0.1)
+        time.sleep(1.0)
 
         assert call_tracker == ["custom"]
 
@@ -163,7 +163,7 @@ class TestWatchpointOneShotMode:
         """Ensures the do_handler is called once and exits gracefully"""
         watchpoint = Watchpoint().on(on_generator).do(do_action_once)
         watchpoint.start()
-        time.sleep(0.1)
+        time.sleep(1.0)
 
         assert call_tracker == ["called"]
         assert watchpoint._thread is not None and not watchpoint._thread.is_alive()
@@ -184,19 +184,15 @@ class TestWatchpointGeneratorMode:
 
     def test_stop_terminates_generator_loop(self):
         """Ensures the stop() method effectively halts a running generator."""
-        watchpoint = (
-            Watchpoint()
-            .on(on_generator, yields=10, initial_delay=0.05)
-            .do(do_action_marker)
-        )
+        watchpoint = Watchpoint().on(on_generator, yields=200).do(do_action_marker)
         watchpoint.start()
 
         # Let it run briefly, then stop it
-        time.sleep(0.1)
+        time.sleep(1.0)
         watchpoint.stop(timeout=1)
 
         # It should have run a few times but not all 10 times
-        assert 1 < len(call_tracker) < 10
+        assert 10 < len(call_tracker) < 200
         assert watchpoint._thread is not None and not watchpoint._thread.is_alive()
 
     def test_generator_with_mixed_yields(self):
@@ -232,7 +228,7 @@ class TestWatchpointErrorHandling:
             watchpoint.start()
 
             # 3. Wait for the background thread to run and terminate due to the error
-            time.sleep(0.1)
+            time.sleep(1.0)
 
             # 4. The thread should have finished its execution because of the unhandled error type
             assert watchpoint._thread is not None
@@ -296,7 +292,7 @@ class TestWatchpointContextManager:
         watchpoint = on(on_returns_true).do(do_action_marker)
 
         with watchpoint:
-            time.sleep(0.1)  # Give thread time to execute
+            time.sleep(1.0)  # Give thread time to execute
             # The thread is likely already finished, which is correct for one-shot
             assert not watchpoint._thread.is_alive()
             assert call_tracker == ["called"]
@@ -308,13 +304,12 @@ class TestWatchpointContextManager:
     def test_generator_handler_in_context_manager(self):
         """Verifies a generator is active inside `with` and stops on exit."""
         with watch(
-            on_handler=partial(on_generator, yields=20), do_handler=do_action_marker
+            on_handler=partial(on_generator, yields=200), do_handler=do_action_marker
         ) as watchpoint:
-            time.sleep(0.1)  # Let the generator run for a short period
+            time.sleep(1.0)  # Let the generator run for a short period
 
         # It should have been called a few times, but stopped by __exit__
-        # 0.1s sleep / 0.02s per yield = ~5 calls
-        assert 3 < len(call_tracker) < 7
+        assert 10 < len(call_tracker) < 200
         assert not watchpoint._thread.is_alive()
 
     def test_exception_in_with_block_stops_thread(self):

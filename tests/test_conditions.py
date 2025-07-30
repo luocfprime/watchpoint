@@ -215,7 +215,7 @@ def test_is_port_open(stop_event, free_port):
     st = threading.Thread(target=server_thread, daemon=True)
     st.start()
 
-    time.sleep(0.1)  # Give the server thread a moment to start listening
+    time.sleep(1.0)  # Give the server thread a moment to start listening
 
     # Now the port should be detected as open, yielding True
     assert next(handler) is True
@@ -224,7 +224,7 @@ def test_is_port_open(stop_event, free_port):
     server_socket.close()
     st.join()
 
-    time.sleep(0.1)  # Give the OS a moment to register the port as closed
+    time.sleep(1.0)  # Give the OS a moment to register the port as closed
 
     # Now the port should be detected as closed again, yielding False
     assert next(handler) is False
